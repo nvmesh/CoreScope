@@ -227,6 +227,44 @@ func TestDecodeAdvertFull(t *testing.T) {
 	}
 }
 
+func TestDecodeAdvertLocationPrecision(t *testing.T) {
+	pubkey := strings.Repeat("AA", 32)
+	timestamp := "78563412" // 0x12345678 LE
+	signature := strings.Repeat("BB", 64)
+	// flags: 0x92 = repeater(2) | hasLocation(0x10) | hasName(0x80)
+	flags := "92"
+	lat := "80753602" // ~37.123456
+	lon := "408BB8F8" // ~-122.123456
+	name := "546573744E6F6465" // "TestNode"
+
+	hex := "1200" + pubkey + timestamp + signature + flags + lat + lon + name
+	pkt, err := DecodePacket(hex, nil, &Config{LocationPrecision: 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pkt.Payload.Type != "ADVERT" {
+		t.Errorf("type=%s, want ADVERT", pkt.Payload.Type)
+	}
+	if pkt.Payload.Flags == nil {
+		t.Fatal("flags should not be nil")
+	}
+	if !pkt.Payload.Flags.HasLocation {
+		t.Error("flags.hasLocation should be true")
+	}
+	if pkt.Payload.Lat == nil {
+		t.Fatal("lat should not be nil")
+	}
+	if math.Abs(*pkt.Payload.Lat-37.12) > 0.001 {
+		t.Errorf("lat=%f, want ~37.12", *pkt.Payload.Lat)
+	}
+	if pkt.Payload.Lon == nil {
+		t.Fatal("lon should not be nil")
+	}
+	if math.Abs(*pkt.Payload.Lon-(-122.12)) > 0.001 {
+		t.Errorf("lon=%f, want ~-122.12", *pkt.Payload.Lon)
+	}
+}
+
 func TestDecodeAdvertTypeEnums(t *testing.T) {
 	makeAdvert := func(flagsByte byte) *DecodedPacket {
 		hex := "1200" + strings.Repeat("AA", 32) + "00000000" + strings.Repeat("BB", 64) +

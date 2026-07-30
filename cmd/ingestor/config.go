@@ -117,6 +117,10 @@ type Config struct {
 	// ingestor reads: where users.db is and whether approved hashtag channels
 	// are decrypted. Everything else in the block belongs to the server.
 	UserManagement *UserManagementConfig `json:"userManagement,omitempty"`
+
+	// LocationPrecision restricts the number of digits of precision for lat/lon
+	// during ingestion, to reduce the precision with which nodes can be tracked.
+	LocationPrecision int `json:"locationPrecision,omitempty"`
 }
 
 // NeighborEdgesDaysOrDefault returns the configured pruning window or 5.
@@ -136,6 +140,15 @@ func (c *Config) IngestBufferSizeOrDefault() int {
 		return c.IngestBufferSize
 	}
 	return 50000
+}
+
+// LocationPrecisionOrDefault returns the number of digits of location precision
+// that should be ingested. Default: 2
+func (c *Config) LocationPrecisionOrDefault() int {
+	if c == nil || c.LocationPrecision <= 0 {
+		return 2
+	}
+	return c.LocationPrecision
 }
 
 // GeoFilterConfig is an alias for the shared geofilter.Config type.

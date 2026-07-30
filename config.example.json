@@ -260,6 +260,8 @@
     ],
     "zoom": 9
   },
+  "locationPrecision": 2,
+  "_comment_locationPrecision": "Number of digits of precision to retain at ingest time. Normally 2 digits is enough precision (block/street level) for analysis without enabling precise tracking of nodes.",
   "geo_filter": {
     "polygon": [
       [37.80, -122.52],
