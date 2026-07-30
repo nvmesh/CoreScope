@@ -243,7 +243,7 @@ func TestHandleClientPacketRelayedAdvertWritesReception(t *testing.T) {
 		"RSSI":      -92.0,
 		"gps":       map[string]interface{}{"lat": 51.05, "lon": 3.72, "acc_m": 8.0},
 	}
-	handleClientPacket(s, "test", testCompanionPK, msg, nil)
+	handleClientPacket(s, "test", testCompanionPK, msg, nil, &Config{})
 
 	var obsName string
 	s.db.QueryRow(`SELECT name FROM client_observers WHERE pubkey=?`, testCompanionPK).Scan(&obsName)
@@ -265,7 +265,7 @@ func TestHandleClientPacketRelayedAdvertWritesReception(t *testing.T) {
 
 	// No GPS → no row.
 	const companion2 = "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3"
-	handleClientPacket(s, "test", companion2, map[string]interface{}{"raw": advertHex, "direction": "rx"}, nil)
+	handleClientPacket(s, "test", companion2, map[string]interface{}{"raw": advertHex, "direction": "rx"}, nil, &Config{})
 	var n2 int
 	s.db.QueryRow(`SELECT COUNT(*) FROM client_receptions WHERE rx_pubkey=?`, companion2).Scan(&n2)
 	if n2 != 0 {
@@ -292,7 +292,7 @@ func TestHandleClientPacketZeroHopAdvertWritesReception(t *testing.T) {
 		"origin": "MyMob", "SNR": -7.0, "RSSI": -92.0,
 		"gps": map[string]interface{}{"lat": 51.05, "lon": 3.72, "acc_m": 8.0},
 	}
-	handleClientPacket(s, "test", testCompanionPK, msg, nil)
+	handleClientPacket(s, "test", testCompanionPK, msg, nil, &Config{})
 
 	var heardKey, src string
 	var keylen int
@@ -323,7 +323,7 @@ func TestHandleClientPacketRejectsNonHexPubkey(t *testing.T) {
 			"origin": "Spoof", "SNR": -7.0, "RSSI": -92.0,
 			"gps": map[string]interface{}{"lat": 51.05, "lon": 3.72, "acc_m": 8.0},
 		}
-		handleClientPacket(s, "test", bad, msg, nil)
+		handleClientPacket(s, "test", bad, msg, nil, &Config{})
 	}
 	var nRecept, nObs int
 	s.db.QueryRow(`SELECT COUNT(*) FROM client_receptions`).Scan(&nRecept)

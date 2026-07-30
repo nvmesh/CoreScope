@@ -21,7 +21,7 @@ var clientPubkeyRe = regexp.MustCompile(`^[0-9a-f]{2,64}$`)
 // companion reports WHERE it directly heard a node, so we write a
 // client_receptions row and never touch the observers/observations tables.
 // rxPubkey is the companion pubkey from the topic (ACL-bound by the broker).
-func handleClientPacket(store *Store, tag, rxPubkey string, msg map[string]interface{}, channelKeys map[string]string) {
+func handleClientPacket(store *Store, tag, rxPubkey string, msg map[string]interface{}, channelKeys map[string]string, cfg *Config) {
 	// The companion identity IS the (ACL-bound) topic pubkey. Reject non-hex
 	// topic segments so a no-ACL broker can't pollute the coverage tables, and
 	// never fall back to a payload-supplied id (that would defeat the ACL trust
@@ -49,7 +49,7 @@ func handleClientPacket(store *Store, tag, rxPubkey string, msg map[string]inter
 		accPtr = &acc
 	}
 
-	decoded, err := DecodePacket(rawHex, channelKeys, false)
+	decoded, err := DecodePacket(rawHex, channelKeys, cfg)
 	if err != nil {
 		log.Printf("MQTT [%s] client decode error: %v", tag, err)
 		return

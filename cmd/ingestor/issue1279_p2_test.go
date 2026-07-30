@@ -10,7 +10,7 @@ import (
 func TestDecodeRawCustomExposesLengthAndTag(t *testing.T) {
 	// header = (1<<6)|(0x0F<<2)|1 = 0x7D ; path byte = 0x00 ; payload = A5 DE AD BE EF
 	hexStr := "7D00A5DEADBEEF"
-	pkt, err := DecodePacket(hexStr, nil, false)
+	pkt, err := DecodePacket(hexStr, nil, &Config{})
 	if err != nil {
 		t.Fatalf("decode: %v", err)
 	}
