@@ -321,7 +321,7 @@ func decodeAck(buf []byte) Payload {
 	return p
 }
 
-func decodeAdvert(buf []byte, validateSignatures bool) Payload {
+func decodeAdvert(buf []byte, cfg *Config) Payload {
 	if len(buf) < 100 {
 		return Payload{Type: "ADVERT", Error: "too short for advert", RawHex: hex.EncodeToString(buf)}
 	}
@@ -339,7 +339,7 @@ func decodeAdvert(buf []byte, validateSignatures bool) Payload {
 		Signature:    signature,
 	}
 
-	if validateSignatures {
+	if cfg.ShouldValidateSignatures() {
 		valid, err := sigvalidate.ValidateAdvert(buf[0:32], buf[36:100], timestamp, appdata)
 		if err != nil {
 			f := false
@@ -901,7 +901,7 @@ func decodeTrace(buf []byte) Payload {
 	return p
 }
 
-func decodePayload(payloadType int, buf []byte, channelKeys map[string]string, validateSignatures bool) Payload {
+func decodePayload(payloadType int, buf []byte, channelKeys map[string]string, cfg *Config) Payload {
 	switch payloadType {
 	case PayloadREQ:
 		return decodeEncryptedPayload("REQ", buf)
@@ -912,7 +912,7 @@ func decodePayload(payloadType int, buf []byte, channelKeys map[string]string, v
 	case PayloadACK:
 		return decodeAck(buf)
 	case PayloadADVERT:
-		return decodeAdvert(buf, validateSignatures)
+		return decodeAdvert(buf, cfg)
 	case PayloadGRP_TXT:
 		return decodeGrpTxt(buf, channelKeys)
 	case PayloadGRP_DATA:
@@ -935,7 +935,7 @@ func decodePayload(payloadType int, buf []byte, channelKeys map[string]string, v
 }
 
 // DecodePacket decodes a hex-encoded MeshCore packet.
-func DecodePacket(hexString string, channelKeys map[string]string, validateSignatures bool) (*DecodedPacket, error) {
+func DecodePacket(hexString string, channelKeys map[string]string, cfg *Config) (*DecodedPacket, error) {
 	hexString = strings.ReplaceAll(hexString, " ", "")
 	hexString = strings.ReplaceAll(hexString, "\n", "")
 	hexString = strings.ReplaceAll(hexString, "\r", "")
@@ -989,7 +989,7 @@ func DecodePacket(hexString string, channelKeys map[string]string, validateSigna
 	if len(payloadBuf) > maxPacketPayload {
 		return nil, fmt.Errorf("packet payload (%d bytes) exceeds firmware MAX_PACKET_PAYLOAD=%d (MeshCore.h:19)", len(payloadBuf), maxPacketPayload)
 	}
-	payload := decodePayload(header.PayloadType, payloadBuf, channelKeys, validateSignatures)
+	payload := decodePayload(header.PayloadType, payloadBuf, channelKeys, cfg)
 
 	// TRACE packets store hop IDs in the payload (buf[9:]) rather than the header
 	// path field. Firmware always sends TRACE as DIRECT (route_type 2 or 3);

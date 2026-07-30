@@ -14,7 +14,7 @@ import (
 // Buffer holds all 216 claimed bytes so the OOB guard does NOT catch.
 func TestDecodePacketRejectsReservedHashSize_Issue1211(t *testing.T) {
 	raw := "12F6" + strings.Repeat("AB", 216) + strings.Repeat("CD", 8)
-	pkt, err := DecodePacket(raw, nil, false)
+	pkt, err := DecodePacket(raw, nil, &Config{})
 	if err == nil {
 		t.Fatalf("expected error rejecting reserved hash_size=4 (firmware Packet.cpp:13-18); got nil, pkt=%+v", pkt)
 	}
@@ -26,7 +26,7 @@ func TestDecodePacketRejectsReservedHashSize_Issue1211(t *testing.T) {
 // pathByte=0xBF → hash_size=3, hash_count=63, total=189 > MAX_PATH_SIZE=64.
 func TestDecodePacketRejectsOversizedPath_Issue1211(t *testing.T) {
 	raw := "12BF" + strings.Repeat("AB", 189) + strings.Repeat("CD", 8)
-	pkt, err := DecodePacket(raw, nil, false)
+	pkt, err := DecodePacket(raw, nil, &Config{})
 	if err == nil {
 		t.Fatalf("expected error rejecting hash_count*hash_size > 64; got nil, pkt=%+v", pkt)
 	}
@@ -35,7 +35,7 @@ func TestDecodePacketRejectsOversizedPath_Issue1211(t *testing.T) {
 // Payload > MAX_PACKET_PAYLOAD (184).
 func TestDecodePacketRejectsOversizedPayload_Issue1211(t *testing.T) {
 	raw := "1200" + strings.Repeat("AA", 200)
-	pkt, err := DecodePacket(raw, nil, false)
+	pkt, err := DecodePacket(raw, nil, &Config{})
 	if err == nil {
 		t.Fatalf("expected error rejecting payload > MAX_PACKET_PAYLOAD=184 (firmware MeshCore.h:19); got nil, pkt=%+v", pkt)
 	}
@@ -82,7 +82,7 @@ func TestDecodePath_AcceptsValidEncodings_Issue1211(t *testing.T) {
 // that exhausts a small buffer, so the OOB guard fires (not validity).
 func TestDecodePacketBoundsFromWireErrorPhrasing_Issue1211(t *testing.T) {
 	raw := "120A" + strings.Repeat("AA", 5)
-	_, err := DecodePacket(raw, nil, false)
+	_, err := DecodePacket(raw, nil, &Config{})
 	if err == nil {
 		t.Fatalf("expected error, got nil")
 	}

@@ -2027,7 +2027,7 @@ func (s *Store) backfillTransportCodes(batchSize int) (int, error) {
 			}
 			seen++
 			lastID = id // advance past undecodable rows too, or they are re-selected forever
-			decoded, err := DecodePacket(raw, nil, false)
+			decoded, err := DecodePacket(raw, nil, &Config{})
 			if err != nil || decoded.TransportCodes == nil {
 				continue
 			}

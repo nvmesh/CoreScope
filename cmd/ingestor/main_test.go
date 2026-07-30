@@ -910,7 +910,7 @@ func TestBuildPacketDataScopeMatching(t *testing.T) {
 	key, _ := hex.DecodeString("9cd8fcf22a47333b591d96a2b848b73f") // SHA256("#test")[:16]
 	regionKeys := map[string][]byte{"#test": key}
 
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatalf("DecodePacket: %v", err)
 	}
@@ -1090,7 +1090,7 @@ func TestBuildPacketDataScopeMatchingNoMatch(t *testing.T) {
 	otherKey, _ := hex.DecodeString("aabbccddeeff00112233445566778899")
 	regionKeys := map[string][]byte{"#other": otherKey}
 
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatalf("DecodePacket: %v", err)
 	}

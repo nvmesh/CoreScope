@@ -1075,8 +1075,7 @@ func handleMessage(store *Store, tag string, source MQTTSource, m mqtt.Message, 
 	// Format 1: Raw packet (meshcoretomqtt / Cisien format)
 	rawHex, _ := msg["raw"].(string)
 	if rawHex != "" {
-		validateSigs := cfg.ShouldValidateSignatures()
-		decoded, err := DecodePacket(rawHex, channelKeys, validateSigs)
+		decoded, err := DecodePacket(rawHex, channelKeys, cfg)
 		if err != nil {
 			// Per #1211: include enough context to repro malformed-packet drops,
 			// but NEVER log the full observer ID (PII / fingerprinting risk).
@@ -1178,7 +1177,7 @@ func handleMessage(store *Store, tag string, source MQTTSource, m mqtt.Message, 
 				return
 			}
 			// Signature validation: drop adverts with invalid ed25519 signatures
-			if validateSigs && decoded.Payload.SignatureValid != nil && !*decoded.Payload.SignatureValid {
+			if cfg.ShouldValidateSignatures() && decoded.Payload.SignatureValid != nil && !*decoded.Payload.SignatureValid {
 				hash := ComputeContentHash(rawHex)
 				truncPK := decoded.Payload.PubKey
 				if len(truncPK) > 16 {

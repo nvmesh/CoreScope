@@ -539,7 +539,7 @@ func (b *keyBackfiller) decide(kind string, p keyBackfillPlan, id int64, raw, ol
 	}
 	switch kind {
 	case keyBackfillKindChannel:
-		decoded, err := DecodePacket(raw, p.channels, false)
+		decoded, err := DecodePacket(raw, p.channels, &Config{})
 		if err != nil || decoded.Payload.Type != "CHAN" || decoded.Payload.Channel == "" {
 			return keyRewrite{}, false
 		}
@@ -550,7 +550,7 @@ func (b *keyBackfiller) decide(kind string, p keyBackfillPlan, id int64, raw, ol
 			oldChannel:  oldChannel,
 		}, true
 	case keyBackfillKindRegion:
-		decoded, err := DecodePacket(raw, nil, false)
+		decoded, err := DecodePacket(raw, nil, &Config{})
 		if err != nil || decoded.TransportCodes == nil || decoded.TransportCodes.Code1 == "0000" {
 			return keyRewrite{}, false
 		}

@@ -650,7 +650,7 @@ func TestEndToEndIngest(t *testing.T) {
 	// Simulate full pipeline: decode + insert
 	rawHex := "120046D62DE27D4C5194D7821FC5A34A45565DCC2537B300B9AB6275255CEFB65D840CE5C169C94C9AED39E8BCB6CB6EB0335497A198B33A1A610CD3B03D8DCFC160900E5244280323EE0B44CACAB8F02B5B38B91CFA18BD067B0B5E63E94CFC85F758A8530B9240933402E0E6B8F84D5252322D52"
 
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -838,7 +838,7 @@ func TestInsertTransmissionNilSNRRSSI(t *testing.T) {
 
 func TestBuildPacketData(t *testing.T) {
 	rawHex := "0A00D69FD7A5A7475DB07337749AE61FA53A4788E976"
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -897,7 +897,7 @@ func TestBuildPacketData(t *testing.T) {
 func TestBuildPacketDataWithHops(t *testing.T) {
 	// A packet with actual hops in the path
 	raw := "0505AABBCCDDEE" + strings.Repeat("00", 10)
-	decoded, err := DecodePacket(raw, nil, false)
+	decoded, err := DecodePacket(raw, nil, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -913,7 +913,7 @@ func TestBuildPacketDataWithHops(t *testing.T) {
 }
 
 func TestBuildPacketDataNilSNRRSSI(t *testing.T) {
-	decoded, _ := DecodePacket("0A00"+strings.Repeat("00", 10), nil, false)
+	decoded, _ := DecodePacket("0A00"+strings.Repeat("00", 10), nil, &Config{})
 	msg := &MQTTPacketMessage{Raw: "0A00" + strings.Repeat("00", 10)}
 	pkt := BuildPacketData(msg, decoded, "", "", nil)
 
@@ -1703,7 +1703,7 @@ func TestObsTimestampIndexMigration(t *testing.T) {
 
 func TestBuildPacketDataScoreAndDirection(t *testing.T) {
 	rawHex := "0A00D69FD7A5A7475DB07337749AE61FA53A4788E976"
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1726,7 +1726,7 @@ func TestBuildPacketDataScoreAndDirection(t *testing.T) {
 }
 
 func TestBuildPacketDataNilScoreDirection(t *testing.T) {
-	decoded, _ := DecodePacket("0A00"+strings.Repeat("00", 10), nil, false)
+	decoded, _ := DecodePacket("0A00"+strings.Repeat("00", 10), nil, &Config{})
 	msg := &MQTTPacketMessage{Raw: "0A00" + strings.Repeat("00", 10)}
 	pkt := BuildPacketData(msg, decoded, "", "", nil)
 
@@ -2156,7 +2156,7 @@ func TestBuildPacketData_TraceUsesPayloadHops(t *testing.T) {
 	// TRACE packet: header path has SNR bytes [30,2D,0D,23], but decoded.Path.Hops
 	// is overwritten to payload hops [67,33,D6,33,67].
 	rawHex := "2604302D0D2359FEE7B100000000006733D63367"
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2193,7 +2193,7 @@ func TestBuildPacketData_NonTracePathJSON(t *testing.T) {
 	// Path byte 0x02 = hash_size 1, hash_count 2
 	// Path bytes: AA BB
 	rawHex := "0902AABB" + "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-	decoded, err := DecodePacket(rawHex, nil, false)
+	decoded, err := DecodePacket(rawHex, nil, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}

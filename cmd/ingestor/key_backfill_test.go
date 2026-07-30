@@ -214,7 +214,7 @@ func TestKeyBackfillChannelMatchesIngestDecision(t *testing.T) {
 	if err := b.runKind(context.Background(), keyBackfillKindChannel); err != nil {
 		t.Fatal(err)
 	}
-	decoded, err := DecodePacket(raw, keys, false)
+	decoded, err := DecodePacket(raw, keys, &Config{})
 	if err != nil {
 		t.Fatal(err)
 	}

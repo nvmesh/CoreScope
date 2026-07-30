@@ -51,7 +51,7 @@ func handleClientPacket(store *Store, cfg *Config, tag, rxPubkey string, msg map
 		accPtr = &acc
 	}
 
-	decoded, err := DecodePacket(rawHex, channelKeys, false)
+	decoded, err := DecodePacket(rawHex, channelKeys, cfg)
 	if err != nil {
 		log.Printf("MQTT [%s] client decode error: %v", tag, err)
 		return

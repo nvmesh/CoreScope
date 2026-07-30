@@ -762,7 +762,7 @@ func TestHandleClientPacketFloodTraceWritesNoCoverage(t *testing.T) {
 	// pathByte 0x41 = hash_size 2, hash_count 1 -> path bytes "1a2b" (SNR, not a hop hash).
 	// payload: tag(4) + authCode(4) + flags(1) = 9 bytes, so decodeTrace succeeds cleanly.
 	raw := "25" + "41" + "1a2b" + "aabbccdd1122334400"
-	decoded, err := DecodePacket(raw, nil, false)
+	decoded, err := DecodePacket(raw, nil, &Config{})
 	if err != nil {
 		t.Fatalf("fixture must decode: %v", err)
 	}
