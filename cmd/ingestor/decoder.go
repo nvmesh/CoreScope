@@ -364,10 +364,11 @@ func decodeAdvert(buf []byte, cfg *Config) Payload {
 
 		off := 1
 		if p.Flags.HasLocation && len(appdata) >= off+8 {
+			multiplier := math.Pow(10, float64(cfg.LocationPrecisionOrDefault()))
 			latRaw := int32(binary.LittleEndian.Uint32(appdata[off : off+4]))
 			lonRaw := int32(binary.LittleEndian.Uint32(appdata[off+4 : off+8]))
-			lat := float64(latRaw) / 1e6
-			lon := float64(lonRaw) / 1e6
+			lat := math.Round((float64(latRaw) / 1e6) * multiplier) / multiplier
+			lon := math.Round((float64(lonRaw) / 1e6) * multiplier) / multiplier
 			p.Lat = &lat
 			p.Lon = &lon
 			off += 8
